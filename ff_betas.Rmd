@@ -1,0 +1,44 @@
+---
+title: "Fama French Betas"
+output:
+  pdf_document:
+    toc: True
+    toc_depth: 2
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Setup
+
+```{r read_fcns, warning=FALSE, message=FALSE}
+source("functions_analysis.R")
+```
+
+# Plots
+
+```{r plots, message = FALSE, warning = FALSE, results = 'asis'}
+companies = levels(as.factor(pull(RL_STCKS, "Company")))
+
+for (col in companies){
+  cat('##', col, '\n')
+
+  sdata = generalized_factor_prep(col, 0.0235/12, 3, list(SP500, oil),
+                                  c("SP", "OIL"))
+  sdata = left_join(sdata, fama_french, by = c("Year" = "YearDM", "Month" = "MonthDM")) %>%
+    left_join(exc_rates, by = c("Year" = "YearEX", "Month" = "MonthEX"))
+  
+  cat("Normal Regression")
+  print(lm_factor_output(sdata))
+  print(accuracy_factor_output(sdata))
+  print(kable(get_CV(sdata)) %>% kable_styling())
+  
+  cat("Stepwise Regression")
+  
+  print(lm_factor_output(sdata, stp = TRUE))
+  print(accuracy_factor_output(sdata, stp = TRUE))
+  print(kable(get_CV(sdata, stp = TRUE)) %>% kable_styling())
+}
+```

@@ -1,0 +1,92 @@
+---
+title: "CAPM Visual"
+output:
+  html_document:
+    code_folding: hide
+    toc: True
+    toc_depth: 2
+    toc_float: True
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Setup
+
+```{r read_fcns, warning=FALSE, message=FALSE}
+source("functions_analysis.R")
+```
+
+# Market Data
+```{r mt_plot, message = FALSE, warning = FALSE, results = 'asis'}
+market_returns = read_csv("data/3yrmt_rts.csv")
+
+for (col in colnames(market_returns)){
+  print(ggplot(market_returns, aes_string(sample = col)) +
+          stat_qq() +
+          stat_qq_line() +
+          labs(x = "Theoretical", y = "Returns/Change", title = paste("Q-Q Plot of", col) ))
+}
+```
+
+# Plots
+
+```{r plots, message = FALSE, warning = FALSE, results = 'asis'}
+companies = levels(as.factor(pull(RL_STCKS, "Company")))
+
+for (col in companies){
+  cat('\n')
+  cat('## ', col)
+  cat('\n')
+  daily_data =
+    generalized_factor_prep(col, 0.0235/365, 3, list(SP500), c("SP"), monthly = FALSE) %>%
+    remove_outliers()
+
+  cat('\n')
+  print(ggplot(daily_data, aes(sample = St_Rtn)) +
+          stat_qq() +
+          stat_qq_line() +
+          labs(x = "Theoretical", y = "Returns", title = "Q-Q Plot of Daily Returns"))
+
+  sdata = generalized_factor_prep(col, 0.0235/12, 3, list(SP500, oil), c("SP", "OIL"))
+  sdata = left_join(sdata, fama_french, by = c("Year" = "YearDM", "Month" = "MonthDM")) %>%
+    left_join(exc_rates, by = c("Year" = "YearEX", "Month" = "MonthEX"))
+  
+  cat('\n')
+  print(
+    ggplot(sdata, aes(x = St_Rtn + 0.0235/12, y = SP)) +
+      geom_point() +
+      geom_smooth(method = "lm") +
+      labs(x = "Market", y = col, title = "Stock Return vs Market Return")
+  )
+  
+  cat('\n')
+  simulated = simulation_market_variables(3000, sdata) %>% data.frame()
+  print(
+    ggplot(simulated, aes(x = St_Rtn)) +
+      geom_histogram(fill = "#23408B", color = "black", alpha = 0.5) +
+      geom_vline(xintercept = quantile(simulated$St_Rtn, 0.01),
+                 color = "red", size=.5, alpha = 0.5) +
+      labs(x = "Excess Returns", y = "Count", title = col) +
+      theme_bw()
+  )
+  cat('\n')
+  cat('\n', 'VaR:', quantile(simulated$St_Rtn, 0.01), '\n', '\n')
+  cat('ES:', mean(simulated$St_Rtn[which(simulated$St_Rtn <= quantile(simulated$St_Rtn, 0.01))]))
+  cat('\n')
+  
+  cat('\n', "Normal Regression")
+  
+  print(lm_factor_output(sdata))
+  print(accuracy_factor_output(sdata))
+  print(kable(get_CV(sdata)) %>% kable_styling())
+  
+  cat("Stepwise Regression")
+  
+  print(lm_factor_output(sdata, stp = TRUE))
+  print(accuracy_factor_output(sdata, stp = TRUE))
+  print(kable(get_CV(sdata, stp = TRUE)) %>% kable_styling())
+  cat('\n')
+}
+```
