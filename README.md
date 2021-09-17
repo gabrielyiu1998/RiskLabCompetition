@@ -5,7 +5,8 @@ for our Case Competition. We were tasked with analyzing market risk, liquidity r
 ETF portfolio using the 20 stocks that was not overly exposed to the risks above. The <a href="https://github.com/gabrielyiu1998/RiskLabCompetition">R code</a>
 uploaded helped us with our stepwise regressions, VaR, and ES calculations.
 
-This project was done in collaboration with Edward Wang and <a href="https://www.linkedin.com/in/jasonho0810/">Jason Ho</a>.
+This project was done in collaboration with <a href="https://github.com/EdJWang">Edward Wang</a> and
+<a href="https://www.linkedin.com/in/jasonho0810/">Jason Ho</a>.
 
 ### Project Highlights
 Slide 4 reviews how we used stepwise regression.
