@@ -10,5 +10,12 @@ This project was done in collaboration with Edward Wang and <a href="https://www
 ### Project Highlights
 Slide 4 reviews how we used stepwise regression.
 
-<img src="https://github.com/gabrielyiu1998/RiskLabCompetition/blob/main/docs/slide4.PNG">
+<img src="https://github.com/gabrielyiu1998/RiskLabCompetition/blob/main/docs/slide4.PNG" width="70%">
 
+Slide 7 reviews our market risk.
+
+<img src="https://github.com/gabrielyiu1998/RiskLabCompetition/blob/main/docs/slide7.PNG" width="70%">
+
+Slide 12 is the recommended ETF weights.
+
+<img src="https://github.com/gabrielyiu1998/RiskLabCompetition/blob/main/docs/slide12.PNG" width="70%">
